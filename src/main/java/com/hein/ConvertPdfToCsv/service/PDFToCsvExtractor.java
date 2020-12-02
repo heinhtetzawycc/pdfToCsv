@@ -159,9 +159,9 @@ public class PDFToCsvExtractor {
                     pageIdNTextsMap.putAll(pageId, textsInRows); // column
                     pageIdNColumnRangesMap.putAll(pageId, columnRangesArray);
                 }
-                System.out.println(pageIdNTextsMap);
+                // System.out.println(pageIdNTextsMap);
 
-                System.out.println(pageIdNColumnRangesMap);
+                // System.out.println(pageIdNColumnRangesMap);
             }
 
             // loop each page
