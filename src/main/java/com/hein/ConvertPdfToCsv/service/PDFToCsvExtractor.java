@@ -183,7 +183,6 @@ public class PDFToCsvExtractor {
                 }
             }
         }
-
         return resultSb.toString();
     }
 

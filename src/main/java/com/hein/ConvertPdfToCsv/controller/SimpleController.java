@@ -1,7 +1,9 @@
 package com.hein.ConvertPdfToCsv.controller;
 
 import java.io.File;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
@@ -58,19 +60,27 @@ public class SimpleController {
     @CrossOrigin(origins = "http://127.0.0.1:8081")
     // @CrossOrigin(origins = "http://bea2d70a0001.ngrok.io/")
     @PostMapping("/api/image/convertText")
-    public @ResponseBody ResponseEntity<String> extractTextFromImage(@RequestParam("imageFile") MultipartFile file,
-            @RequestParam(value = "sperator", defaultValue = "\t") String sperator,  @RequestParam(value = "areas", defaultValue = "0-0-0-0") ArrayList<String> areas, @RequestParam(value = "language", defaultValue = "mya") String lan) {
-                
+    public @ResponseBody ResponseEntity<String> extractTextFromImage(
+            @RequestParam("imageFiles") List<MultipartFile> myFiles,
+            @RequestParam(value = "sperator", defaultValue = "\t") String sperator,
+            @RequestParam(value = "areas") List<ArrayList<String>> areasList,
+            @RequestParam(value = "language", defaultValue = "mya") String lan) {
+        // System.out.println(myFiles.size());
         try {
-            System.out.println(areas);
-            File imgFile = fileConverter.multiPath2File(file);
-            String resultString = imageToTextConvertor.convert(imgFile, sperator, areas, lan);
-            JSONObject obj = new JSONObject();
-            JSONObject obj1 = new JSONObject();
-            obj1.put("1", resultString);
-            obj.put("csv", obj1);
-            obj.put("rectangleCount", "1");
-            return new ResponseEntity<String>(obj.toString(), HttpStatus.OK);
+            System.out.println(areasList);
+            // JSONObject obj = new JSONObject();
+            ArrayList<String> resultList = new ArrayList<String>();
+            for (int i = 0; i < myFiles.size(); i++) {
+            // System.out.println(areasList.get(i));
+                     
+                File imgFile = fileConverter.multiPath2File(myFiles.get(i));
+                String resultString = imageToTextConvertor.convert(imgFile, sperator, areasList.get(i), lan);
+                System.out.println(resultString);
+                resultList.add(resultString);
+                // obj.put("result", resultString);
+            }
+            // System.out.println(resultList.toString());
+            return new ResponseEntity<String>(resultList.toString(), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<String>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -96,7 +106,8 @@ public class SimpleController {
     @CrossOrigin(origins = "http://127.0.0.1:8081")
     // @CrossOrigin(origins = "http://bea2d70a0001.ngrok.io/")
     @PostMapping("/api/image/resizeImage")
-    public @ResponseBody ResponseEntity<String> resizeImage(@RequestParam("imageFile") MultipartFile file,@RequestParam("resizeType") String resizeType) {
+    public @ResponseBody ResponseEntity<String> resizeImage(@RequestParam("imageFile") MultipartFile file,
+            @RequestParam("resizeType") String resizeType) {
         try {
             File imgFile = fileConverter.multiPath2File(file);
             String resultString = fileConverter.resizeImage(ImageIO.read(imgFile), Integer.parseInt(resizeType));

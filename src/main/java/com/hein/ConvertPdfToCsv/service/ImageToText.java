@@ -1,7 +1,7 @@
 package com.hein.ConvertPdfToCsv.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
-
+import org.json.JSONObject;
 import org.opencv.core.Core;
 
 import org.springframework.stereotype.Service;
@@ -31,43 +31,50 @@ public class ImageToText {
         // Load the native library.
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
         // Morphology_3Run morpho = new Morphology_3Run();
+
         try {
-            String firstArea = areas.get(0);
-            // System.out.println(firstArea);
-            String[] strArr = firstArea.split("-");
+            JSONObject obj = new JSONObject();
+            JSONObject obj1 = new JSONObject();
+            System.out.print(areas.size());
             BufferedImage resultImage = (BufferedImage) imageService.getLinesRemovedImage(imgFile, false, false);
+
             ITesseract _tesseract = new Tesseract();
             _tesseract.setLanguage(lan);
-            // Rectangle rect = new Rectangle(23.26, 26.22, 41.35, 97.22); tlbr
-            // 10.69-0.21-99.66-91.68
-            // BufferedImage bufferedImage = ImageIO.read(imgFile);
-            double imageWidth = resultImage.getWidth();
-            double imageHeight = resultImage.getHeight();
-            double top = Double.parseDouble(strArr[0]); // y
-            top = (imageHeight * top) / 100;
-            double left = Double.parseDouble(strArr[1]); // x
-            left = (imageWidth * left) / 100;
-            double bottom = Double.parseDouble(strArr[2]);
-            bottom = (imageHeight * bottom) / 100;
-            double right = Double.parseDouble(strArr[3]);
-            right = (imageWidth * right) / 100;
-            double width = right - left;
-            double height = bottom - top;
-            Rectangle rect = new Rectangle();
-            
-            rect.setRect(left,top,width,height);
-            // rect.setRect(20, 50, 80, 180);  4,3 - 2,5
-            System.out.println(rect);
-            // final rect1 = 
-            // _tesseract.setPageSegMode(2);
-            // _tesseract.setConfigs(configs);
             _tesseract.setTessVariable("user_defined_dpi", "300");
 
-            String result = _tesseract.doOCR(resultImage,rect);
-            if(result.length() > 0){
-                result = result.substring(0, result.length() - 1);
+            for (int i = 0; i < areas.size(); i++) {
+
+                String firstArea = areas.get(i);
+                // System.out.println(firstArea);
+                String[] strArr = firstArea.split("-");
+
+                double imageWidth = resultImage.getWidth();
+                double imageHeight = resultImage.getHeight();
+                double top = Double.parseDouble(strArr[0]); // y
+                top = (imageHeight * top) / 100;
+                double left = Double.parseDouble(strArr[1]); // x
+                left = (imageWidth * left) / 100;
+                double bottom = Double.parseDouble(strArr[2]);
+                bottom = (imageHeight * bottom) / 100;
+                double right = Double.parseDouble(strArr[3]);
+                right = (imageWidth * right) / 100;
+                double width = right - left;
+                double height = bottom - top;
+                Rectangle rect = new Rectangle();
+
+                rect.setRect(left, top, width, height);
+
+                String result = _tesseract.doOCR(resultImage, rect);
+                if (result.length() > 0) {
+                    result = result.substring(0, result.length() - 1);
+                }
+                
+                // System.out.println(result);
+                obj1.put(Integer.toString(i + 1), result.replace(" ", sperator));
             }
-            return result.replace(" ", sperator);
+            obj.put("csv", obj1);
+            obj.put("rectangleCount", Integer.toString(areas.size()));
+            return obj.toString();
         } catch (IOException e) {
             System.out.println(e);
         } catch (Exception e) {
