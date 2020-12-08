@@ -96,11 +96,12 @@ public class Morphology_3Run {
             }
             // delete uploaded image
             fileService.deleteImage(imageFile.getName());
-            fileService.saveImage("linesRemoved.png", bufferedImage);
+            // fileService.saveImage("linesRemoved.png", bufferedImage);
 
             if(getBase64){
                 // Save final result Image to disk
-                fileService.saveImage("linesRemoved.png", bufferedImage);
+                // fileService.saveImage("linesRemoved.png", bufferedImage);
+
                 return fileService.imgToBase64String(bufferedImage, "png");
             } else{
                 return bufferedImage;

@@ -35,7 +35,6 @@ public class ImageToText {
         try {
             JSONObject obj = new JSONObject();
             JSONObject obj1 = new JSONObject();
-            System.out.print(areas.size());
             BufferedImage resultImage = (BufferedImage) imageService.getLinesRemovedImage(imgFile, false, false);
 
             ITesseract _tesseract = new Tesseract();
